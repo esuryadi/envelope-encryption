@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import java.util.UUID;
+import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -66,8 +66,8 @@ class CipherImplTest {
      * Test method for {@link CipherImpl#hash(String, String)}.
      */
     @Test
-    void testHash() {
-        String salt = UUID.randomUUID().toString();
+    void testHash() throws NoSuchAlgorithmException {
+        String salt = CipherUtil.generateNewSalt();
         String hash = this.cipher.hash("Hello World!", salt);
         assertNotNull(hash);
         String hash2 = this.cipher.hash("Hello World!", salt);
