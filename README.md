@@ -5,7 +5,7 @@ key (known as data key) for every word, text or binary data instead of using a s
 database. Then, each of the data key will be encrypted remotely using a master key that resides in Key Management
 System (KMS) such as Google Cloud. This way, it ensures the safety of your data in the event of data breach because 
 attackers would need to compromise every single data key in order to decrypt the encrypted data but only if they also 
-able to breach the master key stored in very highly secured KMS provider fault. Therefore, the chances of compromising
+able to breach the master key stored in very highly secured KMS provider vault. Therefore, the chances of compromising
 data that is encrypted using **envelope-encryption** technique is zero to none.
 
 This is a simple open source SDK api to perform encryption and decryption of text data utilizing the envelope encryption 
