@@ -56,7 +56,7 @@ public interface Cipher {
      * Create a hash string of a given plaintext and salt.
      *
      * @param plaintext Plain text value
-     * @param salt      Bennet Crypto salt
+     * @param salt Salt string
      *
      * @return Hash string
      */
