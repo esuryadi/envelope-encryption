@@ -37,11 +37,11 @@ public class GoogleCipherIT {
     @BeforeAll
     static void setup() {
         Properties properties = new Properties();
-        properties.setProperty("projectId", "envelope-encryption-458913");
-        properties.setProperty("locationId", "us-west2");
-        properties.setProperty("keyRingId", "suryadisoft");
-        properties.setProperty("keyId", "EdwardKey");
-        properties.setProperty("credentialFile", "envelope-encryption-458913-0bafc4c17237.json");
+        properties.setProperty("gcpProjectId", "envelope-encryption-458913");
+        properties.setProperty("gcpLocationId", "us-west2");
+        properties.setProperty("gcpKeyRingId", "suryadisoft");
+        properties.setProperty("gcpKeyId", "EdwardKey");
+        properties.setProperty("gcpCredentialFile", "envelope-encryption-458913-0bafc4c17237.json");
         googleCipher = CipherUtil.getInstance(CipherProvider.Type.GOOGLE_KMS, properties);
     }
 
@@ -55,7 +55,7 @@ public class GoogleCipherIT {
     void testDecrypt() {
         String cipherText = googleCipher.encrypt("Hello World");
         assertNotNull(cipherText);
-        String plainText = googleCipher.decrypt(cipherText);
+        String plainText = new String(googleCipher.decrypt(cipherText));
         assertNotNull(plainText);
         assertEquals("Hello World", plainText);
     }

@@ -19,6 +19,7 @@ import com.google.cloud.kms.v1.KeyManagementServiceClient;
 import com.google.protobuf.ByteString;
 import com.suryadisoft.cipher.CipherImpl;
 import com.suryadisoft.cipher.data.CipherKey;
+import com.suryadisoft.cipher.data.CipherString;
 import com.suryadisoft.cipher.data.GoogleKms;
 import com.suryadisoft.cipher.util.CipherUtil;
 import org.junit.jupiter.api.BeforeAll;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -44,12 +46,8 @@ class GoogleCipherTest {
 
     @BeforeAll
     static void setup() {
-        final GoogleKms googleKms = new GoogleKms("test", "test", "test", "test", "test");
         final String dataKey = CipherUtil.generateNewKey("AES");
-        googleCipher = spy(new GoogleCipher(googleKms, new CipherImpl()));
-        googleCipher.setDataKey(CipherKey.valueOf(dataKey));
         final KeyManagementServiceClient kmsClient = mock(KeyManagementServiceClient.class);
-        doReturn(kmsClient).when(googleCipher).kmsClient();
         final EncryptResponse encryptResp = mock(EncryptResponse.class);
         final ByteString cipherText = ByteString.copyFromUtf8(dataKey);
         when(encryptResp.getCiphertext()).thenReturn(cipherText);
@@ -57,21 +55,23 @@ class GoogleCipherTest {
         final DecryptResponse decryptResponse = mock(DecryptResponse.class);
         when(decryptResponse.getPlaintext()).thenReturn(cipherText);
         when(kmsClient.decrypt(isA(CryptoKeyName.class), isA(ByteString.class))).thenReturn(decryptResponse);
+        googleCipher = new GoogleCipher(new CipherImpl(), kmsClient, new Properties());
+        googleCipher.setDataKey(CipherKey.valueOf(dataKey));
     }
 
     @Test
     void testEncrypt() {
-        String cipherText = googleCipher.encrypt("Hello World");
+        CipherString cipherText = googleCipher.encrypt("Hello World".getBytes());
         assertNotNull(cipherText);
     }
 
     @Test
     void testDecrypt() {
-        String cipherText = googleCipher.encrypt("Hello World");
+        CipherString cipherText = googleCipher.encrypt("Hello World".getBytes());
         assertNotNull(cipherText);
-        String plainText = googleCipher.decrypt(cipherText);
+        byte[] plainText = googleCipher.decrypt(cipherText);
         assertNotNull(plainText);
-        assertEquals("Hello World", plainText);
+        assertEquals("Hello World", new String(plainText));
     }
 
     @Test

@@ -12,6 +12,8 @@
  */
 package com.suryadisoft.cipher.provider;
 
+import com.suryadisoft.cipher.data.CipherString;
+
 /**
  * <code>CipherProvider</code> is a cipher provider interface to encrypt and decrypt data key and text data
  * using a master key from Key Management System (KMS) provider.
@@ -35,7 +37,7 @@ public interface CipherProvider {
      * @param plaintext Plain text
      * @return Encrypted plain text
      */
-    String encrypt(final String plaintext);
+    CipherString encrypt(final byte[] plaintext);
 
     /**
      * Decrypts the cipher text.
@@ -43,7 +45,7 @@ public interface CipherProvider {
      * @param cipherText Encrypted text
      * @return Plain text
      */
-    String decrypt(final String cipherText);
+    byte[] decrypt(final CipherString cipherText);
 
     /**
      * Hashes the plain text with predefined salt.

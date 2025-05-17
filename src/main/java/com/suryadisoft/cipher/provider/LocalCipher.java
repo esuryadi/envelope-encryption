@@ -15,15 +15,16 @@ package com.suryadisoft.cipher.provider;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.suryadisoft.cipher.Cipher;
+import com.suryadisoft.cipher.cache.CacheConfig;
+import com.suryadisoft.cipher.cache.CipherCache;
 import com.suryadisoft.cipher.data.CipherData;
 import com.suryadisoft.cipher.data.CipherKey;
-import com.suryadisoft.cipher.exception.CipherException;
+import com.suryadisoft.cipher.data.CipherString;
 import org.apache.commons.codec.binary.Base64;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Properties;
 
 /**
  * <code>GoogleCipher</code> is a Google KMS provider implementation.
@@ -34,17 +35,26 @@ import java.util.regex.Pattern;
 public class LocalCipher implements CipherProvider {
 
     private final Cipher cipher;
+    private final CipherCache cipherCache;
     private final CipherKey masterKey;
 
-    public LocalCipher(final Cipher cipher, final String masterKey) {
+    public LocalCipher(final Cipher cipher, final Properties properties) {
         this.cipher = cipher;
-        this.masterKey = CipherKey.valueOf(masterKey);
+        this.masterKey = CipherKey.valueOf(properties.getProperty("masterKey"));
+        this.cipherCache = new CipherCache(CacheConfig.valueOf(properties), base64DataKey -> {
+            // Decode the base64 encrypted data key
+            final byte[] encryptedDataKey = Base64.decodeBase64(base64DataKey);
+            // Decrypt the data key
+            final byte[] dataKey = this.cipher.decrypt(new CipherData(this.masterKey, encryptedDataKey));
+            // Transform into CipherKey
+            return CipherKey.valueOf(dataKey);
+        });
     }
 
     @Override
-    public String encrypt(String plaintext) {
+    public CipherString encrypt(final byte[] plaintext) {
         // Encrypt the plain text
-        final CipherData cipherData = this.cipher.encrypt(plaintext.getBytes());
+        final CipherData cipherData = this.cipher.encrypt(plaintext);
         // Get the data key that is created
         final CipherKey dataKey = cipherData.dataKey();
         // Encrypt the data key with master key
@@ -52,27 +62,15 @@ public class LocalCipher implements CipherProvider {
         // Convert the encrypted String to base64 string
         final String encryptedDataKeyBase64Str = Base64.encodeBase64URLSafeString(encryptedDataKey.cipherText());
 
-        return "{" + encryptedDataKeyBase64Str + "}" + Base64.encodeBase64URLSafeString(cipherData.cipherText());
+        return new CipherString(encryptedDataKeyBase64Str, Base64.encodeBase64URLSafeString(cipherData.cipherText()));
     }
 
     @Override
-    public String decrypt(String cipherText) {
-        final Pattern cipherTextPattern = Pattern.compile("\\{(.*)}(.*)");
-        // Parse the encrypted text
-        final Matcher cipher = cipherTextPattern.matcher(cipherText);
-        if (cipher.find()) {
-            // Decode the base64 encrypted data key
-            final byte[] encryptedDataKey = Base64.decodeBase64(cipher.group(1));
-            // Retrieve the encrypted text
-            final byte[] encryptedText = Base64.decodeBase64(cipher.group(2));
-            // Decrypt the data key
-            final byte[] dataKey = this.cipher.decrypt(new CipherData(this.masterKey, encryptedDataKey));
-            // Transform into CipherKey
-            final CipherKey cipherKey = CipherKey.valueOf(dataKey);
-            return new String(this.cipher.decrypt(new CipherData(cipherKey, encryptedText)));
-        } else {
-            throw new CipherException("Invalid cipher text format!");
-        }
+    public byte[] decrypt(final CipherString cipherText) {
+        final CipherKey cipherKey = this.cipherCache.getDataKey(cipherText.base64DataKey());
+        final byte[] encryptedText = Base64.decodeBase64(cipherText.base64CipherText());
+
+        return this.cipher.decrypt(new CipherData(cipherKey, encryptedText));
     }
 
     @Override

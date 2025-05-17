@@ -38,7 +38,7 @@ public class CipherUtilTest {
     void testDecrypt() {
         String cipherText = CipherUtil.getInstance().encrypt("Hello World");
         assertNotNull(cipherText);
-        String plainText = CipherUtil.getInstance().decrypt(cipherText);
+        String plainText = new String(CipherUtil.getInstance().decrypt(cipherText));
         assertNotNull(plainText);
         assertEquals("Hello World", plainText);
     }

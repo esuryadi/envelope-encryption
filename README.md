@@ -47,21 +47,31 @@ algorithm=AES
 # Specification for information about standard algorithm names.
 hashAlgorithm=SHA3-256
 
+# Data Key Cache Configuration
+# Initial cache capacity reserved in memory
+initialCapacity=16
+# Number of concurrency level when retrieving cache value
+concurrencyLevel=4
+# Maximum number of data key cached in memory
+maximumSize=100
+# Length of data key idle time that is stored in the cache before it's expired in milliseconds
+expireDuration=10000
+
 # Local KMS configuration (if you maintain your own master key)
 # The base64 master key string generated using the CipherUtil#generateNewKey(String)
 masterKey=
 
 # Google KMS configuration
 # Google Service Account json file to access Google KMS
-credentialFile=
+gcpCredentialFile=
 # Google Cloud Platform project id
-projectId=
+gcpProjectId=
 # Google KMS key ring location
-locationId=
+gcpLocationId=
 # Google KMS key ring id
-keyRingId=
+gcpKeyRingId=
 # Google KMS key id
-keyId=
+gcpKeyId=
 ```
 
 ## Usage Examples
@@ -96,7 +106,7 @@ String encryptedText = cipherUtil.encrypt("plaintext");
 
 ### Decrypting Data
 ```java
-String plainText = cipherUtil.decrypt(encryptedText);
+String plainText = new String(cipherUtil.decrypt(encryptedText));
 ```
 
 ### Hashing Data

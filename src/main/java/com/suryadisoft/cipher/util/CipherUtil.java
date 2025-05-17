@@ -15,6 +15,7 @@ package com.suryadisoft.cipher.util;
 import com.suryadisoft.cipher.CipherImpl;
 import com.suryadisoft.cipher.data.CipherConfig;
 import com.suryadisoft.cipher.data.CipherKey;
+import com.suryadisoft.cipher.data.CipherString;
 import com.suryadisoft.cipher.data.GoogleKms;
 import com.suryadisoft.cipher.provider.CipherProvider;
 import com.suryadisoft.cipher.provider.GoogleCipher;
@@ -45,14 +46,14 @@ public class CipherUtil {
      * Creates an instance of {@link CipherUtil} for a given kms provider type and configuration properties.
      *
      * @param providerType KMS provider type
-     * @param properties Configuration properties
+     * @param properties   Configuration properties
      */
     private CipherUtil(final CipherProvider.Type providerType, final Properties properties) {
         this.properties = properties;
         if (providerType == CipherProvider.Type.GOOGLE_KMS) {
-            this.cipherProvider = new GoogleCipher(GoogleKms.valueOf(properties), new CipherImpl(CipherConfig.valueOf(properties)));
+            this.cipherProvider = new GoogleCipher(new CipherImpl(CipherConfig.valueOf(properties)), properties);
         } else {
-            this.cipherProvider = new LocalCipher(new CipherImpl(CipherConfig.valueOf(properties)), properties.getProperty("masterKey"));
+            this.cipherProvider = new LocalCipher(new CipherImpl(CipherConfig.valueOf(properties)), properties);
         }
     }
 
@@ -138,17 +139,27 @@ public class CipherUtil {
      * @return Encrypted plain text
      */
     public String encrypt(final String plainText) {
-        return Optional.ofNullable(plainText).map(cipherProvider::encrypt).orElse(null);
+        return Optional.ofNullable(plainText).map(String::getBytes).map(this::encrypt).orElse(null);
     }
 
     /**
-     * Decrypts the cipher text.
+     * Encrypts the bytes array.
+     *
+     * @param bytes Bytes Array
+     * @return Encrypted bytes array
+     */
+    public String encrypt(final byte[] bytes) {
+        return Optional.ofNullable(bytes).map(cipherProvider::encrypt).map(CipherString::toString).orElse(null);
+    }
+
+    /**
+     * Decrypts the cipher text into bytes array.
      *
      * @param cipherText Encrypted text
-     * @return Plain text
+     * @return Bytes Array
      */
-    public String decrypt(final String cipherText) {
-        return Optional.ofNullable(cipherText).map(cipherProvider::decrypt).orElse(null);
+    public byte[] decrypt(final String cipherText) {
+        return Optional.ofNullable(cipherText).map(CipherString::valueOf).map(cipherProvider::decrypt).orElse(null);
     }
 
     /**
@@ -165,7 +176,6 @@ public class CipherUtil {
      * Generates a new data key for a given security algorithm, e.g. "AES".
      *
      * @param algorithm the standard name of the requested key algorithm.
-     *
      * @return Data key in base64 string
      */
     static public String generateNewKey(final String algorithm) {
@@ -184,7 +194,6 @@ public class CipherUtil {
      * Generates a new hashing salt.
      *
      * @return Hash Salt string
-     *
      * @throws NoSuchAlgorithmException if Algorithm is invalid
      */
     static public String generateNewSalt() throws NoSuchAlgorithmException {

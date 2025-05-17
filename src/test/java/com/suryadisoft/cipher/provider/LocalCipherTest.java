@@ -12,16 +12,23 @@
  */
 package com.suryadisoft.cipher.provider;
 
+import com.suryadisoft.cipher.Cipher;
 import com.suryadisoft.cipher.CipherImpl;
+import com.suryadisoft.cipher.data.CipherData;
+import com.suryadisoft.cipher.data.CipherString;
 import com.suryadisoft.cipher.util.CipherUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.mockito.internal.verification.Times;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.*;
 
 /**
  * <code>LocalCipherTest</code> class is a unit-test for {@link LocalCipher} implementation class.
@@ -33,25 +40,34 @@ import static org.junit.jupiter.api.Assertions.*;
 class LocalCipherTest {
 
     private static CipherProvider localCipher;
+    private static Cipher cipher;
 
     @BeforeAll
     static void setup() {
-        localCipher = new LocalCipher(new CipherImpl(), CipherUtil.generateNewKey("AES"));
+        Properties properties = new Properties();
+        properties.setProperty("masterKey", CipherUtil.generateNewKey("AES"));
+        cipher = spy(new CipherImpl());
+        localCipher = new LocalCipher(cipher, properties);
     }
 
     @Test
     void testEncrypt() {
-        String cipherText = localCipher.encrypt("Hello World");
+        CipherString cipherText = localCipher.encrypt("Hello World".getBytes());
         assertNotNull(cipherText);
     }
 
     @Test
     void testDecrypt() {
-        String cipherText = localCipher.encrypt("Hello World");
+        CipherString cipherText = localCipher.encrypt("Hello World".getBytes());
         assertNotNull(cipherText);
-        String plainText = localCipher.decrypt(cipherText);
+        byte[] plainText = localCipher.decrypt(cipherText);
         assertNotNull(plainText);
-        assertEquals("Hello World", plainText);
+        assertEquals("Hello World", new String(plainText));
+        verify(cipher, times(2)).decrypt(isA(CipherData.class));
+        plainText = localCipher.decrypt(cipherText);
+        assertNotNull(plainText);
+        assertEquals("Hello World", new String(plainText));
+        verify(cipher, times(3)).decrypt(isA(CipherData.class));
     }
 
     @Test

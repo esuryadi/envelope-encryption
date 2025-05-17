@@ -45,11 +45,11 @@ public record GoogleKms(String projectId, String locationId, String keyRingId, S
      * @return {@link GoogleKms} instance
      */
     static public GoogleKms valueOf(final Properties properties) {
-        final String projectId = properties.getProperty("projectId");
-        final String locationId = properties.getProperty("locationId");
-        final String keyRingId = properties.getProperty("keyRingId");
-        final String keyId = properties.getProperty("keyId");
-        final String credentialFile = properties.getProperty("credentialFile");
+        final String projectId = properties.getProperty("gcpProjectId", "");
+        final String locationId = properties.getProperty("gcpLocationId", "");
+        final String keyRingId = properties.getProperty("gcpKeyRingId", "");
+        final String keyId = properties.getProperty("gcpKeyId", "");
+        final String credentialFile = properties.getProperty("gcpCredentialFile", "");
 
         return new GoogleKms(projectId, locationId, keyRingId, keyId, credentialFile);
     }
