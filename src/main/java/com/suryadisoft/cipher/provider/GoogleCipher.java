@@ -122,8 +122,6 @@ public class GoogleCipher implements CipherProvider {
     @Override
     public byte[] decrypt(final CipherString cipherText) {
         final CipherKey dataKey = this.cipherCache.getDataKey(cipherText.base64DataKey());
-        // Retrieve the base64 encrypted data key
-        final ByteString encryptedDataKey = ByteString.copyFrom(Base64.decodeBase64(cipherText.base64DataKey().getBytes()));
         // Retrieve the encrypted text
         final byte[] encryptedText = Base64.decodeBase64(cipherText.base64CipherText());
 
