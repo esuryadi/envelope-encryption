@@ -2,17 +2,46 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.suryadisoft</groupId>
+    <groupId>com.suryadisoft.api</groupId>
     <artifactId>envelope-encryption</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <name>envelope-encryption</name>
+    <description>
+        Envelope Encryption is an encryption technique where you encrypt privacy or sensitive data using a unique
+        key (known as data key) for every word, text or binary data instead of using a single key to encrypt the
+        entire database
+    </description>
+    <url>https://github.com/esuryadi/envelope-encryption</url>
     <packaging>jar</packaging>
 
     <properties>
         <junit.platform.version>1.6.2</junit.platform.version>
         <main.basedir>${project.basedir}</main.basedir>
+        <gpg.keyname>0xC6AD5D1F</gpg.keyname>
         <skipITs>true</skipITs>
     </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Edward Suryadi</name>
+            <email>edward@suryadisoft.com</email>
+            <organization>Suryadisoft</organization>
+            <organizationUrl>https://www.linkedin.com/in/edward-suryadi/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com:esuryadi/envelope-encryption.git</connection>
+        <developerConnection>scm:git:ssh://github.com:esuryadi/envelope-encryption.git</developerConnection>
+        <url>https://github.com/esuryadi/envelope-encryption</url>
+    </scm>
 
     <dependencies>
         <dependency>
@@ -65,6 +94,69 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <keyname>${gpg.keyname}</keyname>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.3</version>
+                <configuration>
+                    <reportPlugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <configuration>
+                                <additionalparam>none</additionalparam>
+                            </configuration>
+                        </plugin>
+                    </reportPlugins>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.5.3</version>
                 <executions>
@@ -78,6 +170,17 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.7.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>mavenCentralDeploymentRepo</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -24,9 +24,9 @@ local .m2 directory, add the following maven dependency in your maven project po
 
 ```xml
 	<dependency>
-		<groupId>com.suryadisoft</groupId>
+		<groupId>com.suryadisoft.api</groupId>
 		<artifactId>envelope-encryption</artifactId>
-		<version>1.0.0</version>
+		<version>1.2.0</version>
 	</dependency>
 ```
 
