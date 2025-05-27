@@ -91,11 +91,11 @@ CipherUtil cipherUtil = CipherUtil.getInstance(properties);
 #### Instantiates with google kms configuration inside the properties
 ```java
 Properties properties = new Properties();
-properties.setProperty("projectId", "myProject");
-properties.setProperty("locationId", "us-west2");
-properties.setProperty("keyRingId", "keyRing");
-properties.setProperty("keyId", "myKey");
-properties.setProperty("credentialFile", "myFile.json"); // on classpath
+properties.setProperty("gcpProjectId", "myProject");
+properties.setProperty("gcpLocationId", "us-west2");
+properties.setProperty("gcpKeyRingId", "keyRing");
+properties.setProperty("gcpKeyId", "myKey");
+properties.setProperty("gcpCredentialFile", "myFile.json"); // on classpath
 CipherUtil cipherUtil = CipherUtil.getInstance(Type.GOOGLE_KMS, properties);
 ```
 
