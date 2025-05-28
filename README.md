@@ -19,8 +19,7 @@ Ideally the encrypted data key and encrypted data should be stored separately in
 
 ## Importing envelope-encryption SDK
 
-Once you download the jar file of this release from my GitHub repository and import it into your own repository or 
-local .m2 directory, add the following maven dependency in your maven project pom.xml file:
+Add the following maven dependency in your maven project pom.xml file:
 
 ```xml
 	<dependency>
